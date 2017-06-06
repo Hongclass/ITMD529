@@ -1,0 +1,55 @@
+%macro replaceprefix(lib,dsn,start,end,oldprefix,newprefix);
+	proc contents data=&lib..&dsn.;
+	title 'before renaming';
+	run;
+	data temp;
+	set &lib..&dsn.;
+	run;
+
+	%LET ds=%SYSFUNC(OPEN(temp,i));
+	%let ol=%length(&oldprefix.);
+	%do i=&start %to &end;
+	%let dsvn&i=%SYSFUNC(VARNAME(&ds,&i));
+	%let l=%length(&&dsvn&i);
+	%let vn&i=&newprefix.%SUBSTR(&&dsvn&i,&ol+1,%EVAL(&l-&ol));
+	%end;
+	data &lib..&dsn.;
+	set temp;
+	%do i=&start %to &end;
+	&&vn&i=&&dsvn&i;
+	drop &&dsvn&i;
+	%end;
+	%let rc=%SYSFUNC(CLOSE(&ds));
+	proc contents data=&lib..&dsn.;
+	title 'Replacing Prefix on Selected variables ';
+	run;
+%mend replaceprefix;
+
+
+%macro replacesuffix(lib,dsn,start,end,oldsuffix,newsuffix);
+proc contents data=&lib..&dsn.;
+title 'before renaming';
+run;
+data temp;
+set &lib..&dsn.;
+run;
+%LET ds=%SYSFUNC(OPEN(temp,i));
+%let ol=%length(&oldsuffix.);
+%do i=&start %to &end;
+%let dsvn&i=%SYSFUNC(VARNAME(&ds,&i));
+%let l=%length(&&dsvn&i);
+%let vn&i=%SUBSTR(&&dsvn&i,1,%EVAL(&l-&ol))&newsuffix.;
+%end;
+data &lib..&dsn.;
+set temp;
+%do i=&start %to &end;
+&&vn&i=&&dsvn&i;
+drop &&dsvn&i;
+%end;
+%let rc=%SYSFUNC(CLOSE(&ds));
+proc contents data=&lib..&dsn.;
+title ' Replacing Suffix on Selected variables ';
+run;
+%mend replacesuffix;
+
+%replacesuffix(WORK,internal,2,30,_sum,);;

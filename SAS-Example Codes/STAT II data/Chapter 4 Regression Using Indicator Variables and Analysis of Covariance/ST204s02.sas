@@ -1,0 +1,21 @@
+proc glm data=sasuser.school;
+   class gender;
+   model reading3=gender words1 gender*words1;
+run;
+quit;
+				 						*ST204s02.sas;
+proc glm data=sasuser.school;
+   class gender;
+   model reading3=gender|words1 / solution;
+run;
+quit;									*ST204s02.sas;
+
+proc glm data=sasuser.school;
+   class gender;
+   model reading3=gender|words1;
+   lsmeans gender / pdiff adjust=tukey;
+   lsmeans gender / at words1=40 pdiff adjust=tukey;
+   lsmeans gender / at words1=60 pdiff adjust=tukey;
+run;
+quit;
+										*ST204s02.sas;

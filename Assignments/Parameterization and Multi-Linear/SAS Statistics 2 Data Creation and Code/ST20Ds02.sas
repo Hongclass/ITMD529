@@ -1,0 +1,22 @@
+
+*a*;
+proc sgplot data=STAT2.nonlin;
+   scatter y=y x=x;
+title 'Data NONLIN - Y Plotted on Original Scale';
+run; 							*ST20Ds02.sas;
+*b*;
+proc sgplot data=STAT2.nonlin;
+  scatter y=y x=x;
+  yaxis  type=log logbase=e;
+title 'Data NONLIN - Y Plotted on Log Scale';
+run; 							*ST20Ds02.sas;
+*c*;
+proc reg data=STAT2.nonlin plots=all;
+   model logy=x;
+   title 'Regression Model on LogY';
+run;							*ST20Ds02.sas;
+*d*;
+proc genmod data=STAT2.nonlin plots=stdreschi(xbeta);
+   model y=x / dist=normal link=log obstats;
+run;
+				 				*ST20Ds02.sas;

@@ -1,0 +1,13 @@
+data sixmonths;
+   set orion.orders_midyear;
+   keep customer_id month sales;
+   array months{6} month1-month6;
+   do Month=1 to 6;
+      if months{Month} ne . then do;
+         Sales=months{Month};
+         output;
+      end;
+   end;
+run;
+proc print data=sixmonths;
+run;

@@ -1,0 +1,11 @@
+data compound;
+   Amount=50000;
+   Rate=.045;
+   Yearly=Amount*Rate;
+   Quarterly+((Quarterly+Amount)*Rate/4);
+   Quarterly+((Quarterly+Amount)*Rate/4);
+   Quarterly+((Quarterly+Amount)*Rate/4);
+   Quarterly+((Quarterly+Amount)*Rate/4);
+run;
+proc print data=compound noobs;
+run;

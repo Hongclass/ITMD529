@@ -1,0 +1,12 @@
+data change;                 
+   set orion.employee_donations;
+   drop i; 
+   array Contrib{4} qtr1-qtr4;        
+   array Diff{3};                  
+   do i=1 to 3;                       
+      diff{i}=contrib{i+1}-contrib{i};
+   end;                               
+run; 
+proc print data=change noobs;  
+   var Employee_ID Diff1-Diff3;         
+run;

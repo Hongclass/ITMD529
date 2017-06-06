@@ -1,0 +1,73 @@
+proc tabulate data=DATA.MAIN_201206 order=data missing;
+where dda eq 1;
+var dda: mms: tda: sav: mtg: heq: iln: ccs: ira: trs: sec: card ccs_amt ins ind: sln: hh sdb: ;
+CLASS fworks_flag1 tag_new / PRELOADFMT;
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (dda='Checking' mms='Mon Mkt' sav='Savings' tda='Time Dep' ira='IRA' mtg='Mortgage' heq='Home Eq' card='Credit Card' iln='Dir Loan' ind='Ind Loan' sln='Student loan'
+sec='Securities' ins='Insurance' trs='Trust' sdb='Safe Deposit' )*sum='Product HHs'*f=comma12. / nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (dda='Checking' mms='Mon Mkt' sav='Savings' tda='Time Dep' ira='IRA' mtg='Mortgage' heq='Home Eq' card='Credit Card' iln='Dir Loan' ind='Ind Loan' sln='Student loan'
+sec='Securities' ins='Insurance' trs='Trust' sdb='Safe Deposit' )*pctsum<hh>='Penet'*f=pctfmt. / nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (dda_amt='Checking'*pctsum<dda>='Avg. Bal.' mms_amt='Mon Mkt'*pctsum<mms>='Avg. Bal.' sav_amt='Savings'*pctsum<sav>='Avg. Bal.' tda_amt='Time Dep'*pctsum<tda>='Avg. Bal.'
+ira_amt='IRA'*pctsum<ira>='Avg. Bal.' mtg_amt='Mortgage'*pctsum<mtg>='Avg. Bal.' heq_amt='Home Eq'*pctsum<heq>='Avg. Bal.' ccs_amt='Credit Card'*pctsum<card>='Avg. Bal.' iln_amt='Dir Loan'*pctsum<iln>='Avg. Bal.' ind_amt='Ind Loan'*pctsum<ind>='Avg. Bal.'
+sln_amt='Student loan'*pctsum<sln>='Avg. Bal.' sec_amt='Securities'*pctsum<sec>='Avg. Bal.' trs_amt='Trust'*pctsum<trs>='Avg. Bal.' )*f=pctdoll. / nocellmerge misstext ='0.0';
+run;
+data temp_main;
+set DATA.MAIN_201206;
+where dda eq 1;
+keep hhid fworks_flag1 tag_new hh;
+run;
+data temp_contr;
+merge DATA.Contrib_201206 (in=a) temp_main (in=b);
+by hhid;
+if b;
+total_contr=sum(dda_con,mms_con,sav_con,tda_con,ira_con,mtg_con,heq_con,card_con,iln_con,ind_con,sec_con,trs_con,sln_con);
+run;
+proc tabulate data=temp_contr order=data missing;
+var dda: mms: tda: sav: mtg: heq: iln: ira: trs: sec: card_con ind: sln: hh total_contr;
+CLASS fworks_flag1 tag_new / PRELOADFMT;
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (dda_con='Checking'*pctsum<hh>='Avg. Con.' mms_con='Mon Mkt'*pctsum<hh>='Avg. Con.' sav_con='Savings'*pctsum<hh>='Avg. Con.' tda_con='Time Dep'*pctsum<hh>='Avg. Con.'
+ira_con='IRA'*pctsum<hh>='Avg. Con.' mtg_con='Mortgage'*pctsum<hh>='Avg. Con.' heq_con='Home Eq'*pctsum<hh>='Avg. Con.' card_con='Credit Card'*pctsum<hh>='Avg. Con.' iln_con='Dir Loan'*pctsum<hh>='Avg. Con.' ind_con='Ind Loan'*pctsum<hh>='Avg. Con.'
+sln_con='Student loan'*pctsum<hh>='Avg. Con.' sec_con='Securities'*pctsum<hh>='Avg. Con.' trs_con='Trust'*pctsum<hh>='Avg. Con.' total_contr='Total'*pctsum<hh>='Avg. Con.')*f=pctdoll. / nocellmerge misstext ='0.0';
+run;
+proc tabulate data=DATA.MAIN_201206 order=data missing;
+where dda eq 1;
+var hh;
+CLASS fworks_flag1 tag_new segment band ixi_tot cbr distance tenure_yr tran_code/ PRELOADFMT;
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (segment)*N='HHs'*f=comma12. segment*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (tran_code='Tran. Segment')*N='HHs'*f=comma12. tran_code='Tran. Segment'*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (ixi_tot='Estimated Wealth')*N='HHs'*f=comma12. ixi_tot='Estimated Wealth'*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (cbr)*N='HHs'*f=comma12. cbr*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (distance='Dist to Branch')*N='HHs'*f=comma12. distance='Dist to Branch'*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (tenure_yr="tenure (Yrs)")*N='HHs'*f=comma12. tenure_yr="tenure (Yrs)"*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+table (fworks_flag1 All) * (tag_new All) All, sum='All'*hh='HHs'*f=comma12. (band='Profit Band')*N='HHs'*f=comma12. band='Profit Band'*rowPCTN="Percent"*f=pctfmt./ nocellmerge misstext ='0';
+format segment segfmt. cbr cbr2012fmt. tenure_yr tenureband. ixi_tot ixifmt. distance distfmt. tran_code $transegm.;
+keylabel rowpctN=' ';
+run;
+data temp_hh;
+set data.main_201206;
+where dda eq 1;
+keep hhid hh fworks_flag1 tag_new ;
+run;
+data temp_demog;
+merge data.demog_201206 (in=a) temp_hh (in=b);
+by hhid;
+if a and b;
+run;
+proc tabulate data=temp_demog missing;
+class fworks_flag1 tag_new ;
+class dwelling education income ethnic_rollup home_owner marital poc: gender age_hoh religion languag length_resid ;
+var hh;
+table (dwelling='Type of Residence' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (education='Education Level' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (income='Estimated Income' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (ethnic_rollup='Ethnicity' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (home_owner='Home Ownership' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (marital='Marital Status' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (poc="Children" all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (gender='Gender' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (age_hoh="HOH Age" all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (religion all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (languag='Language' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+table (length_resid='Length of Residence' all),(N="HHs"*f=comma12. colpctN="Percent"*f=pctfmt.)*(fworks_flag1 All) * (tag_new All) All / nocellmerge misstext='0';
+format dwelling $dwelling. education $educfmt. income $incmfmt. home_owner $homeowner. marital $marital. religion $religion. languag $language. length_resid $residence. age_hoh ageband. ethnic_rollup $ethnic.;
+keylabel rowpctN=' ';
+run;

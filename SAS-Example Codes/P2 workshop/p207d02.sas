@@ -1,0 +1,12 @@
+data compound(drop=i);
+   Amount=50000;
+   Rate=.045;
+   do i=1 to 20;
+      Yearly +(Yearly+Amount)*Rate;
+   end;
+   do i=1 to 80;
+      Quarterly+((Quarterly+Amount)*Rate/4);
+   end;
+run;
+proc print data=compound noobs;
+run;
